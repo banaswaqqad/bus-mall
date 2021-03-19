@@ -5,11 +5,18 @@
 let myImgArray = [];
 let numAttempts = 25;
 let userAttempts = 0;
+let imgNames = [];
+let imgShown = [];
+let imgVotes = [];
 
 
 let firstImgIndex;
 let secondImgIndex; 
 let thirdImgIndex;
+
+let theIndexes = [firstImgIndex, secondImgIndex, thirdImgIndex];
+
+
 let imgDiv = document.getElementById('images');
 let firstImg = document.createElement('img');
 firstImg.id = 'firstImg';
@@ -17,10 +24,15 @@ let secondImg = document.createElement('img');
 secondImg.id = 'secondImg';
 let thirdImg = document.createElement('img');
 thirdImg.id = 'thirdImg';
-let resultList = document.getElementById('resultList');
+
+let thefirstImgTitle = document.createElement('h2');
+let thesecondImgTitle = document.createElement('h2');
+let thethirdImgTitle = document.createElement('h2');
+
+
 let form = document.getElementById('form');
 let button = document.getElementById('resultButton');
-
+var ctx = document.getElementById('resultChart').getContext('2d');
 
 function theProduct(imgName) {
     this.name = imgName;
@@ -28,6 +40,10 @@ function theProduct(imgName) {
     this.shown = 0;
     this.vote = 0;
     myImgArray.push(this);
+    imgNames.push(this.name);
+    imgShown.push(this.shown);
+    imgVotes.push(this.vote);
+
 }
 
 
@@ -77,55 +93,67 @@ function userClick(event) {
     if (numAttempts > 0) {
         if (event.target.id === firstImg.id) {
           myImgArray[firstImgIndex].vote++;
-            chooseThreeImages();
+            
             renderImages();
         } else if (event.target.id === secondImg.id) {
           myImgArray[secondImgIndex].vote++;
-            chooseThreeImages();
+           
             renderImages();
         } else if (event.target.id === thirdImg.id) {
           myImgArray[thirdImgIndex].vote++;
-            chooseThreeImages();
+            
             renderImages();
         }
         else {
           numAttempts++;
         }
-    } else {
-        result();
-    }
+        for (let i = 0; i < myImgArray.length; i++) {
+          imgVotes[i] = myImgArray[i].vote;
+      }
+  } else {
+      button.removeAttribute('disabled');
+      imgDiv.removeEventListener('click', userClick);
+  }
+
 }
 
 function result() {
-    var results;
-    for (var i = 0; i <myImgArray.length; i++) {
-        results = document.createElement('li');
-        results.textContent = myImgArray[i].name + ' earn ' + myImgArray[i].vote + ' from ' + myImgArray[i].shown + ' times it was showed.';
-        resultList.appendChild(results);
-    }
-    imgDiv.removeEventListener('click', userClick);
+  renderChart();
 }
 
 
 function chooseThreeImages() {
    
+  do {
     firstImgIndex = randomIndex();
     do {
         secondImgIndex = randomIndex();
         thirdImgIndex = randomIndex();
     } while (firstImgIndex === secondImgIndex || firstImgIndex === thirdImgIndex || secondImgIndex === thirdImgIndex)
-    myImgArray[firstImgIndex].shown++
-    myImgArray[secondImgIndex].shown++
-    myImgArray[thirdImgIndex].shown++
+} while (theIndexes.includes(firstImgIndex) || theIndexes.includes(secondImgIndex) || theIndexes.includes(thirdImgIndex))
+
+myImgArray[firstImgIndex].shown++;
+myImgArray[secondImgIndex].shown++;
+myImgArray[thirdImgIndex].shown++;
+for (var i = 0; i < myImgArray.length; i++) {
+    imgShown[i] = myImgArray[i].shown;
+}
+theIndexes = [firstImgIndex, secondImgIndex, thirdImgIndex];
 }
 
 function renderImages() {
-    firstImg.src = myImgArray[firstImgIndex].src;
-    imgDiv.appendChild(firstImg);
-    secondImg.src = myImgArray[secondImgIndex].src;
-    imgDiv.appendChild(secondImg);
-    thirdImg.src = myImgArray[thirdImgIndex].src;
-    imgDiv.appendChild(thirdImg);
+  thefirstImgTitle.textContent = myImgArray[firstImgIndex].name;
+  imgDiv.appendChild(thefirstImgTitle);
+  thesecondImgTitle.textContent = myImgArray[secondImgIndex].name;
+  imgDiv.appendChild(thesecondImgTitle);
+  thethirdImgTitle.textContent = myImgArray[thirdImgIndex].name;
+  imgDiv.appendChild(thethirdImgTitle);
+  firstImg.src = myImgArray[firstImgIndex].src;
+  imgDiv.appendChild(firstImg);
+  secondImg.src = myImgArray[secondImgIndex].src;
+  imgDiv.appendChild(secondImg);
+  thirdImg.src = myImgArray[thirdImgIndex].src;
+  imgDiv.appendChild(thirdImg);
 }
 
 //random function (hoistng)
@@ -133,7 +161,35 @@ function randomIndex() {
     return Math.floor(Math.random() * myImgArray.length);
 }
 
-
+function rendertheChart() {
+  let myChart = new Chart(ctx, {
+      type: 'horizontalBar',
+      data: {
+          labels: imgNames,
+          datasets: [
+              {
+                  label: "seen",
+                  backgroundColor: "#3b5360",
+                  data: imgShown
+              }, {
+                  label: "voted",
+                  backgroundColor: "#8b5e83",
+                  data: imgVotes
+              }
+          ]
+      },
+      options: {
+          title: {
+              display: true,
+              text: 'Vote Results',
+              position: 'bottom',
+          },
+          data: {
+              precision: 0
+          }
+      }
+  });
+}
 
 
 

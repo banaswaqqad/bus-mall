@@ -1,7 +1,7 @@
 
 
 :root{
-    --darkBlue: #3b5360;
+    --darkBlue: #265528;
     --darkPurple: #8b5e83;
     --lightBlue: #bee5d3;
     --lightPurple: #d6b0b1;
@@ -27,7 +27,7 @@ header, footer{
 }
 header>h1{
     position: absolute;
-    color: var(--darkPurple);
+    color: slategrey;
     display: inline;
     font-family: 'Amatic SC', cursive;
     font-size: 50px;

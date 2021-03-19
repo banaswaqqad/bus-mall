@@ -2,10 +2,14 @@
 'use strict'
 
 
-let myImgArray = [];
+let imgArray = JSON.parse(localStorage.getItem('allProducts'));
+console.log('after get', imgArray);
+
+
+
 let numAttempts = 25;
 let userAttempts = 0;
-let imgNames = [];
+
 let imgShown = [];
 let imgVotes = [];
 
@@ -32,6 +36,7 @@ let thethirdImgTitle = document.createElement('h2');
 
 let form = document.getElementById('form');
 let button = document.getElementById('resultButton');
+let chart = document.getElementById('resultChart');
 var ctx = document.getElementById('resultChart').getContext('2d');
 
 function theProduct(imgName) {
@@ -39,36 +44,39 @@ function theProduct(imgName) {
     this.src = '../img/' + imgName + '.jpg';
     this.shown = 0;
     this.vote = 0;
-    myImgArray.push(this);
-    imgNames.push(this.name);
+  
     imgShown.push(this.shown);
     imgVotes.push(this.vote);
 
 }
 
+if (imgArray === []) {
+  imgArray = [
+new theProduct('bag'),
+new theProduct('banana'),
+new theProduct('bathroom'),
+new theProduct('boots'),
+new theProduct('breakfast'),
+new theProduct('bubblegum'),
+new theProduct('chair'),
+new theProduct('cthulhu'),
+new theProduct('dog-duck'),
+new theProduct('dragon'),
+new theProduct('pen'),
+new theProduct('pet-sweep'),
+new theProduct('scissors'),
+new theProduct('shark'),
+new theProduct('sweep'),
+new theProduct('tauntaun'),
+new theProduct('unicorn'),
+new theProduct('usb'),
+new theProduct('water-can'),
+new theProduct('wine-glass'),
 
-new theProduct('bag');
-new theProduct('banana');
-new theProduct('bathroom');
-new theProduct('boots');
-new theProduct('breakfast');
-new theProduct('bubblegum');
-new theProduct('chair');
-new theProduct('cthulhu');
-new theProduct('dog-duck');
-new theProduct('dragon');
-new theProduct('pen');
-new theProduct('pet-sweep');
-new theProduct('scissors');
-new theProduct('shark');
-new theProduct('sweep');
-new theProduct('tauntaun');
-new theProduct('unicorn');
-new theProduct('usb');
-new theProduct('water-can');
-new theProduct('wine-glass');
+  ];
 
-
+  console.log('inside if', imgArray) 
+}
 chooseThreeImages();
 renderImages();
 
@@ -79,10 +87,10 @@ button.addEventListener('click', result, { once: true });
 
 
 function submitted(event) {
-    console.log(event.target.userAttempts.value);
+    
     event.preventDefault();
     userAttempts = event.target.userAttempts.value;
-    console.log(document.getElementById('userAttempts'));
+    
     numAttempts= userAttempts;
 }
 
@@ -92,23 +100,23 @@ function userClick(event) {
     console.log(numAttempts);
     if (numAttempts > 0) {
         if (event.target.id === firstImg.id) {
-          myImgArray[firstImgIndex].vote++;
+          imgArray[firstImgIndex].vote++;
             
             renderImages();
         } else if (event.target.id === secondImg.id) {
-          myImgArray[secondImgIndex].vote++;
+          imgArray[secondImgIndex].vote++;
            
             renderImages();
         } else if (event.target.id === thirdImg.id) {
-          myImgArray[thirdImgIndex].vote++;
+          imgArray[thirdImgIndex].vote++;
             
             renderImages();
         }
         else {
           numAttempts++;
         }
-        for (let i = 0; i < myImgArray.length; i++) {
-          imgVotes[i] = myImgArray[i].vote;
+        for (let i = 0; i < imgArray.length; i++) {
+          imgVotes[i] = imgArray[i].vote;
       }
   } else {
       button.removeAttribute('disabled');
@@ -118,7 +126,18 @@ function userClick(event) {
 }
 
 function result() {
-  renderChart();
+
+  for (let i = 0; i < imgArray.length; i++) {
+    imgShown[i] = imgArray[i].shown;
+    imgVotes[i] = imgArray[i].vote;
+}
+chart.style.display = "block";
+renderChart();
+
+
+
+
+localStorage.setItem('allProducts', JSON.stringify(imgArray));
 }
 
 
@@ -132,38 +151,42 @@ function chooseThreeImages() {
     } while (firstImgIndex === secondImgIndex || firstImgIndex === thirdImgIndex || secondImgIndex === thirdImgIndex)
 } while (theIndexes.includes(firstImgIndex) || theIndexes.includes(secondImgIndex) || theIndexes.includes(thirdImgIndex))
 
-myImgArray[firstImgIndex].shown++;
-myImgArray[secondImgIndex].shown++;
-myImgArray[thirdImgIndex].shown++;
-for (var i = 0; i < myImgArray.length; i++) {
-    imgShown[i] = myImgArray[i].shown;
+ImgArray[firstImgIndex].shown++;
+ImgArray[secondImgIndex].shown++;
+ImgArray[thirdImgIndex].shown++;
+for (var i = 0; i < ImgArray.length; i++) {
+    imgShown[i] = ImgArray[i].shown;
 }
 theIndexes = [firstImgIndex, secondImgIndex, thirdImgIndex];
 }
 
 function renderImages() {
-  thefirstImgTitle.textContent = myImgArray[firstImgIndex].name;
+  thefirstImgTitle.textContent = ImgArray[firstImgIndex].name;
   imgDiv.appendChild(thefirstImgTitle);
-  thesecondImgTitle.textContent = myImgArray[secondImgIndex].name;
+  thesecondImgTitle.textContent = ImgArray[secondImgIndex].name;
   imgDiv.appendChild(thesecondImgTitle);
-  thethirdImgTitle.textContent = myImgArray[thirdImgIndex].name;
+  thethirdImgTitle.textContent = ImgArray[thirdImgIndex].name;
   imgDiv.appendChild(thethirdImgTitle);
-  firstImg.src = myImgArray[firstImgIndex].src;
+  firstImg.src = ImgArray[firstImgIndex].src;
   imgDiv.appendChild(firstImg);
-  secondImg.src = myImgArray[secondImgIndex].src;
+  secondImg.src = ImgArray[secondImgIndex].src;
   imgDiv.appendChild(secondImg);
-  thirdImg.src = myImgArray[thirdImgIndex].src;
+  thirdImg.src = ImgArray[thirdImgIndex].src;
   imgDiv.appendChild(thirdImg);
 }
 
 //random function (hoistng)
 function randomIndex() {
-    return Math.floor(Math.random() * myImgArray.length);
+    return Math.floor(Math.random() * ImgArray.length);
 }
 
-function rendertheChart() {
-  let myChart = new Chart(ctx, {
-      type: 'horizontalBar',
+function renderChart() {
+  var imgNames = [];
+  for (var i = 0; i < imgArray.length; i++) {
+      imgNames[i] = imgArray[i].name + ' (' + (imgArray[i].vote * imgArray[i].shown) / 100 + '%)';
+  }
+  new Chart(ctx, {
+      type: 'bar',
       data: {
           labels: imgNames,
           datasets: [
@@ -186,7 +209,21 @@ function rendertheChart() {
           },
           data: {
               precision: 0
+          },
+          maintainAspectRatio: true,
+          aspectRatio: 2,
+          scales: {
+              yAxes: [{
+                  ticks: {
+                      // max:50,
+                      min: 0,
+                      beginAtZero: 0,
+                      // stepSize: 1,
+                  }
+              }],
+
           }
+
       }
   });
 }
